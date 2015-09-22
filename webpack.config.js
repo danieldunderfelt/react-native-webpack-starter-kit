@@ -1,39 +1,58 @@
 var path = require('path');
 var webpack = require('webpack');
 
-module.exports = {
-  debug: true,
-  devtool: 'source-map',
-  watch: true,
-  entry: {
-    'index.ios': ['./src/main.ios.js'],
-    'index.android': ['./src/main.android.js'],
-  },
-  output: {
-    path: path.resolve(__dirname, 'build'),
-    filename: '[name].js',
-  },
-  module: {
-    loaders: [
-      {
-        test: /\.(js|jsx|es6)$/,
-        exclude: /node_modules/,
-        loaders: ['babel-loader?optional=runtime']
-      },
-      {
-        test: /\.js$/,
-        include: /node_modules\/react-native-video/,
-        loaders: ['babel-loader?optional=es7.objectRestSpread']
-      },
-      {
-        test: /\.js$/,
-        include: /node_modules\/react-native-localization/,
-        loaders: ['babel-loader?optional=runtime']
-      }
-    ]
-  },
-  resolve: { extensions: ['', '.js', '.jsx', '.es6'] },
-  plugins: [
-    new webpack.NoErrorsPlugin(),
-  ],
+var config = {
+    debug: true,
+    devtool: 'eval',
+    entry: {
+        'index.ios': [
+            'react-native-webpack-server/hot/entry',
+            'webpack/hot/only-dev-server',
+            'webpack-dev-server/client?http://localhost:8082',
+            './src/main.ios.js'
+        ],
+        'index.android': [
+            'react-native-webpack-server/hot/entry',
+            'webpack/hot/only-dev-server',
+            'webpack-dev-server/client?http://localhost:8082',
+            './src/main.android.js'
+        ],
+    },
+    output: {
+        path: path.resolve(__dirname, 'build'),
+        filename: '[name].js',
+        publicPath: 'http://localhost:8082/'
+    },
+    module: {
+        loaders: [{
+            test: /\.(js|jsx)$/,
+            exclude: /node_modules/,
+            loader: 'babel',
+            query: {
+                stage: 0,
+                optional: ['runtime'],
+                plugins: ['react-transform'],
+                extra: {
+                    "react-transform": [{
+                        target: 'react-transform-hmr',
+                        imports: ['react-native'],
+                        locals: ['module']
+                    }]
+                }
+            }
+        }]
+    },
+    resolve: {extensions: ['', '.js', '.jsx', '.es6']},
+    plugins: [
+        new webpack.NoErrorsPlugin(),
+        new webpack.HotModuleReplacementPlugin()
+    ],
 };
+
+// Production config
+if (process.env.NODE_ENV === 'production') {
+    config.plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
+    config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+}
+
+module.exports = config
