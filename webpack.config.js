@@ -16,7 +16,7 @@ var config = {
             'webpack/hot/only-dev-server',
             'webpack-dev-server/client?http://localhost:8082',
             './src/main.android.js'
-        ],
+        ]
     },
     output: {
         path: path.resolve(__dirname, 'build'),

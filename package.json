@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "bundle": "react-native-webpack-server bundle",
-    "start": "react-native-webpack-server start --hot"
+    "start": "react-native-webpack-server start --hot",
+    "clear-cache": "node clearcache.js"
   },
   "dependencies": {
     "babel-runtime": "^5.8.24",
